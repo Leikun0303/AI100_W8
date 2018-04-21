@@ -46,7 +46,7 @@ if __name__ == '__main__':
     else:
         ckpt = ''
     for i in range(30):
-        steps = int(step_per_epoch * (i + 1))
+        steps =3000 # int(step_per_epoch * (i + 1))
         # train 1 epoch
         print('################    train    ################')
         p = os.popen(train_cmd.format(**{'dataset_name': FLAGS.dataset_name, 'dataset_dir': FLAGS.dataset_dir,
