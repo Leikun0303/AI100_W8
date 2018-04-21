@@ -93,6 +93,8 @@ def densenet(images, num_classes=1001, is_training=False,
             # *2表示一个1 X 1 和 3 X 3的卷积层,即函数block()
             # 每个block之后需要进行一次1 X 1,步长为1的卷积层进行压缩和1次2 X 2,步长为2的平均池化层
 
+            print('Conv+pool_Before_block net\'s shape:', net.shape)
+
             # Dense Block-01
             net = block(net, 6, growth, 'Block01')
             end_points['Block01'] = net
@@ -100,6 +102,8 @@ def densenet(images, num_classes=1001, is_training=False,
             # Transition Layer-01
             net=Trans_block(net,'01')
         
+            print('Block01+Trans01 net\'s shape:', net.shape)
+
             # Dense Block-02
             net = block(net, 12, growth, 'Block02')
             end_points['Block02'] = net
@@ -107,12 +111,16 @@ def densenet(images, num_classes=1001, is_training=False,
             # Transition Layer-02
             net=Trans_block(net,'02')
 
+            print('Block02+Trans02 net\'s shape:', net.shape)
+
             # Dense Block-03
             net = block(net, 24, growth, 'Block03')
             end_points['Block03'] = net
 
             # Transition Layer-03
             net=Trans_block(net,'03')
+
+            print('Block03+Trans03 net\'s shape:', net.shape)
 
             # Dense Block-04
             net = block(net, 16, growth, 'Block04')
