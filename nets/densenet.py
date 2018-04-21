@@ -123,7 +123,7 @@ def densenet(images, num_classes=1001, is_training=False,
 
             print('last layers net\'s shape:', net.shape)
             # 最后一个block04之后,跟着一个 7 X 7的平均池化层
-            net = slim.avg_pool2d(net, [7, 7], scope='Pool_global')
+            net = slim.avg_pool2d(net, net.shape[1:3], scope='Pool_global')
             end_points['Pool_global'] = net
             
             # 然后就是将net进行flatten后全连接
