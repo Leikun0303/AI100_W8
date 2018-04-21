@@ -56,15 +56,18 @@ def densenet(images, num_classes=1001, is_training=False,
         return int(int(input_feature.shape[-1]) * compression_rate)
 
     def Trans_block(net,block_num):
-        
+
         # 1 X 1 X reduce_dim(net) 卷积层
+        print('   No reduce_dim net\'s shape:', net.shape)
         net = slim.conv2d(net, reduce_dim(net), [1, 1], stride=1,scope=('Conv_trans'+block_num))
         end_points['Conv_trans'+block_num] = net
-
+        print('   reduce_dim net\'s shape:', net.shape)
+        
         # 2 X 2 平均池化层
         net = slim.avg_pool2d(net, [2, 2], stride=2, scope=('Pool_trans'+block_num))
         end_points['Pool_trans'+block_num] = net
-
+        print('   avg_pool2d net\'s shape:', net.shape)
+        
         return net
 
     end_points = {}
@@ -78,7 +81,7 @@ def densenet(images, num_classes=1001, is_training=False,
 
             # 根据论文 Implementation Details. 中描述,图像在进入block之前要进行:
             # 1个 7 X 7 X (2* growth) 的卷积层,步长为2;以及
-            # 1个 3 X 3 的最大池化层,步长为2,padding为VALID
+            # 1个 3 X 3 的最大池化层,步长为2,padding为SAME
 
             # 7 X 7 X (2* growth)卷积层
             print('images\'s shape:', images.shape)
@@ -86,14 +89,14 @@ def densenet(images, num_classes=1001, is_training=False,
             end_points['Conv_Before_block'] = net
 
             # 3 X 3 最大池化层
-            net = slim.max_pool2d(net, [3, 3], stride=2, padding='VALID', scope='Pool_Before_block')
+            net = slim.max_pool2d(net, [3, 3], stride=2, padding='SAME', scope='Pool_Before_block')
             end_points['Pool_Before_block'] = net
             
             # 这里采用DenseNet-121的网络结构,即block1为6*2,block2为12*2,block3为24*2,block4为16*2
             # *2表示一个1 X 1 和 3 X 3的卷积层,即函数block()
             # 每个block之后需要进行一次1 X 1,步长为1的卷积层进行压缩和1次2 X 2,步长为2的平均池化层
 
-            print('Conv+pool_Before_block net\'s shape:', net.shape)
+            print('Conv+pool_Before_block01 net\'s shape:', net.shape)
 
             # Dense Block-01
             net = block(net, 6, growth, 'Block01')
@@ -126,10 +129,7 @@ def densenet(images, num_classes=1001, is_training=False,
             net = block(net, 16, growth, 'Block04')
             end_points['Block04'] = net
 
-            # Transition Layer-04
-            net=Trans_block(net,'04')
-
-            print('last layers net\'s shape:', net.shape)
+            print('Block04 last_net\'s shape:', net.shape)
             # 最后一个block04之后,跟着一个 7 X 7的平均池化层
             net = slim.avg_pool2d(net, net.shape[1:3], scope='Pool_global')
             end_points['Pool_global'] = net
@@ -137,7 +137,10 @@ def densenet(images, num_classes=1001, is_training=False,
             # 然后就是将net进行flatten后全连接
             net = slim.flatten(net, scope='Flatten')
             end_points['Flatten'] =net
-            
+
+            print('Flatten net\'s shape:', net.shape)
+            print('num_classes:', num_classes)
+
             # 全连接层
             logits = slim.fully_connected(net, num_classes, activation_fn=None, scope='Logits')
             end_points['logits'] = logits
