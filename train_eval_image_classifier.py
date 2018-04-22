@@ -46,7 +46,7 @@ if __name__ == '__main__':
     else:
         ckpt = ''
     for i in range(30):
-        steps =800 # int(step_per_epoch * (i + 1))
+        steps =1500 # int(step_per_epoch * (i + 1))
         # train 1 epoch
         print('################    train    ################')
         p = os.popen(train_cmd.format(**{'dataset_name': FLAGS.dataset_name, 'dataset_dir': FLAGS.dataset_dir,
@@ -54,8 +54,8 @@ if __name__ == '__main__':
                                          'checkpoint_exclude_scopes': FLAGS.checkpoint_exclude_scopes, 'train_dir': FLAGS. train_dir,
                                          'learning_rate': FLAGS.learning_rate, 'optimizer': FLAGS.optimizer,
                                          'batch_size': FLAGS.batch_size, 'max_number_of_steps': steps, 'clone_on_cpu': FLAGS.clone_on_cpu}) + ckpt)
-        # for l in p:
-        #     print(p.strip())
+        for l in p:
+            print(l.strip())
 
         # eval
         print('################    eval    ################')
@@ -63,5 +63,5 @@ if __name__ == '__main__':
                                         'dataset_split_name': 'validation', 'model_name': FLAGS. model_name,
                                         'checkpoint_path': FLAGS.train_dir, 'batch_size': FLAGS.batch_size,
                                         'eval_dir': FLAGS. eval_dir, 'max_num_batches': FLAGS. max_num_batches}))
-        # for l in p:
-        #     print(p.strip())
+        for l in p:
+            print(l.strip())
